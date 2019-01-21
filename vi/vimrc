@@ -1,0 +1,31 @@
+
+" Your customised tags go first.
+
+set list listchars=tab:>-
+highlight ExtraWhitespace ctermbg=red guibg=red
+match ExtraWhitespace /\s\+$/
+
+set tags+=~/tags,$DOC/tags
+let parent_dir = expand("%:p:h")."/"
+while match(parent_dir,"/",0)>-1 && isdirectory(parent_dir)
+  let parent_tag = parent_dir."tags"
+  if filereadable(parent_tag)
+    exe ":set tags+=".parent_tag
+  endif
+  let parent_dir = substitute(parent_dir,"[^/]*/$","","")
+endwhile
+let parent_dir = getcwd()."/"
+while match(parent_dir,"/",0)>-1 && isdirectory(parent_dir)
+  let parent_tag = parent_dir."tags"
+  if filereadable(parent_tag)
+    exe ":set tags+=".parent_tag
+  endif
+  let parent_dir = substitute(parent_dir,"[^/]*/$","","")
+endwhile
+unlet parent_dir parent_tag
+
+" Return to last edit position when opening files (You want this!)
+autocmd BufReadPost *
+     \ if line("'\"") > 0 && line("'\"") <= line("$") |
+     \   exe "normal! g`\"" |
+     \ endif
